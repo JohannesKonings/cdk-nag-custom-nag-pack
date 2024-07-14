@@ -3,10 +3,11 @@ import { CfnGlobalTable } from "aws-cdk-lib/aws-dynamodb";
 import { Bucket, CfnBucket } from "aws-cdk-lib/aws-s3";
 import { Aspects, Stack } from "aws-cdk-lib/core";
 import { validateStack, TestType, TestPack } from "./utils";
-import { TagsExist } from "../../src/rules/index";
+import { TagsWithValueExist } from "../../src/rules/index";
 
-const testPack = new TestPack([TagsExist], {
-  cr1TagsToCheck: ["name", "owner"],
+const testPack = new TestPack([TagsWithValueExist], {
+  // cr2TagsWithValueToCheck: [{ tagName: "Stage", tagValue: ["dev", "prod"] }],
+  cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },
 });
 let stack: Stack;
 
@@ -15,8 +16,8 @@ beforeEach(() => {
   Aspects.of(stack).add(testPack);
 });
 
-describe("tagsExist", () => {
-  const ruleId = "tagsExist";
+describe("tagsWithValueExist", () => {
+  const ruleId = "tagsWithValueExist";
   test("Noncompliance S3 no defined tags", () => {
     new CfnBucket(stack, "rCfnBucket");
     validateStack(stack, ruleId, TestType.NON_COMPLIANCE);
@@ -32,16 +33,23 @@ describe("tagsExist", () => {
     });
     validateStack(stack, ruleId, TestType.NON_COMPLIANCE);
   });
+  test("Noncompliance S3 right tag, wrong value", () => {
+    new CfnBucket(stack, "rCfnBucket", {
+      tags: [
+        {
+          key: "Stage",
+          value: "test",
+        },
+      ],
+    });
+    validateStack(stack, ruleId, TestType.NON_COMPLIANCE);
+  });
   test("Compliance", () => {
     new CfnBucket(stack, "rCfnBucket", {
       tags: [
         {
-          key: "name",
-          value: "some value",
-        },
-        {
-          key: "owner",
-          value: "some value",
+          key: "Stage",
+          value: "prod",
         },
       ],
     });
@@ -49,18 +57,22 @@ describe("tagsExist", () => {
   });
   test("Compliance with tags after instantiation", () => {
     const bucket = new CfnBucket(stack, "bucket");
-    cdkLibTags.of(bucket).add("name", "some value");
-    cdkLibTags.of(bucket).add("owner", "some value");
+    cdkLibTags.of(bucket).add("Stage", "dev");
 
     validateStack(stack, ruleId, TestType.COMPLIANCE);
   });
 
   test("Compliance if tags applied to stack as aspects", () => {
     new Bucket(stack, "bucket");
-    cdkLibTags.of(stack).add("name", "some value");
-    cdkLibTags.of(stack).add("owner", "some value");
+    cdkLibTags.of(stack).add("Stage", "dev");
 
     validateStack(stack, ruleId, TestType.COMPLIANCE);
+  });
+  test("Noncompliance if tags applied to stack as aspects, but with wrong value", () => {
+    new Bucket(stack, "bucket");
+    cdkLibTags.of(stack).add("Stage", "test");
+
+    validateStack(stack, ruleId, TestType.NON_COMPLIANCE);
   });
   test("Compliance if tags applied to stack as parameter", () => {
     const stackWithTagsParameter = new Stack(
@@ -68,8 +80,7 @@ describe("tagsExist", () => {
       "stackWithTagsParameter",
       {
         tags: {
-          name: "some value",
-          owner: "some value",
+          Stage: "dev",
         },
       },
     );

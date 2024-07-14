@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 18.x
       - name: Install dependencies
-        run: yarn install --check-files --frozen-lockfile
+        run: npm ci
       - name: release
         run: npx projen release
       - name: Check if version has already been tagged
@@ -109,7 +109,7 @@ jobs:
       - name: Prepare Repository
         run: mv dist .repo
       - name: Install Dependencies
-        run: cd .repo && yarn install --check-files --frozen-lockfile
+        run: cd .repo && npm ci
       - name: Create js artifact
         run: cd .repo && npx projen package:js
       - name: Collect js Artifact

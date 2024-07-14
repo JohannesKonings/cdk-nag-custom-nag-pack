@@ -16,7 +16,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   prettier: true,
   deps: [],
   devDeps: ["cdk-nag", "@aws-cdk/assert"],
-  peerDeps: ["cdk-nag", "aws-cdk-lib"],
+  peerDeps: ["cdk-nag@^2.28.159", "aws-cdk-lib"],
   keywords: ["aws", "cdk", "cdk-nag", "custom-nag-pack"],
 });
 project.synth();

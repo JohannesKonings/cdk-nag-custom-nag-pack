@@ -24,6 +24,7 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressionIgnoreCondition">suppressionIgnoreCondition</a></code> | <code>cdk-nag.INagSuppressionIgnore</code> | Conditionally prevent rules from being suppressed (default: no user provided condition). |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.verbose">verbose</a></code> | <code>boolean</code> | Whether or not to enable extended explanatory descriptions on warning, error, and logged ignore messages (default: false). |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 
 ---
 
@@ -109,6 +110,16 @@ public readonly cr1TagsToCheck: string[];
 
 ---
 
+##### `cr2TagsWithValueToCheck`<sup>Optional</sup> <a name="cr2TagsWithValueToCheck" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck"></a>
+
+```typescript
+public readonly cr2TagsWithValueToCheck: {[ key: string ]: string[]};
+```
+
+- *Type:* {[ key: string ]: string[]}
+
+---
+
 ## Classes <a name="Classes" id="Classes"></a>
 
 ### CustomChecks <a name="CustomChecks" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecks"></a>
@@ -162,6 +173,7 @@ All aspects can visit an IConstruct.
 | --- | --- | --- |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecks.property.readPackName">readPackName</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecks.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecks.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 
 ---
 
@@ -182,6 +194,16 @@ public readonly cr1TagsToCheck: string[];
 ```
 
 - *Type:* string[]
+
+---
+
+##### `cr2TagsWithValueToCheck`<sup>Required</sup> <a name="cr2TagsWithValueToCheck" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecks.property.cr2TagsWithValueToCheck"></a>
+
+```typescript
+public readonly cr2TagsWithValueToCheck: {[ key: string ]: string[]};
+```
+
+- *Type:* {[ key: string ]: string[]}
 
 ---
 

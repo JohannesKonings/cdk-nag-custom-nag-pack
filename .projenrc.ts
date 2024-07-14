@@ -10,17 +10,13 @@ const project = new awscdk.AwsCdkConstructLibrary({
   name,
   packageName: `${scope}/${name}`,
   npmAccess: javascript.NpmAccess.PUBLIC,
+  packageManager: javascript.NodePackageManager.NPM,
   projenrcTs: true,
   repositoryUrl: "git@github.com:JohannesKonings/cdk-nag-custom-nag-pack.git",
   prettier: true,
   deps: [],
   devDeps: ["cdk-nag", "@aws-cdk/assert"],
   peerDeps: ["cdk-nag", "aws-cdk-lib"],
-
-  // deps: [],                /* Runtime dependencies of this module. */
-  // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
-  // packageName: undefined,  /* The "name" in package.json. */
   keywords: ["aws", "cdk", "cdk-nag", "custom-nag-pack"],
 });
 project.synth();

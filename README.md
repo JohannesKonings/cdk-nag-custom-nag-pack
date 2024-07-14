@@ -4,9 +4,10 @@
 
 ## rules
 
-| Rule ID | Cause                   | Explanation                          |
-| ------- | ----------------------- | ------------------------------------ |
-| CR1     | Definend tags not exist | Certain tags are checked if it exist |
+| Rule ID | Cause                         | Explanation                                 |
+| ------- | ----------------------------- | ------------------------------------------- |
+| CR1     | Definend tags not exist       | Certain tags are checked if it exist        |
+| CR2     | Definend tags has wrong value | Certain tags are checked with defined value |
 
 ## config
 
@@ -18,8 +19,10 @@ import { CustomChecks } from '@jaykingson/cdk-nag-custom-nag-pack'
 Aspects.of(app).add(new CustomChecks({
     // use whatever tags you want to check
   cr1TagsToCheck: ['Environment', 'Owner'],
+  cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },
 }));
 ```
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

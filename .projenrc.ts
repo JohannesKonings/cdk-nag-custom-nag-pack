@@ -4,19 +4,19 @@ const scope = "@jaykingson";
 const project = new awscdk.AwsCdkConstructLibrary({
   author: "Johannes Konings",
   authorAddress: "johannes.konings@outlook.com",
-  cdkVersion: "2.146.0",
+  cdkVersion: "2.156.0",
   defaultReleaseBranch: "main",
   jsiiVersion: "~5.4.0",
   name,
   packageName: `${scope}/${name}`,
   npmAccess: javascript.NpmAccess.PUBLIC,
-  packageManager: javascript.NodePackageManager.NPM,
+  packageManager: javascript.NodePackageManager.PNPM,
   projenrcTs: true,
   repositoryUrl: "git@github.com:JohannesKonings/cdk-nag-custom-nag-pack.git",
   prettier: true,
   deps: [],
   devDeps: ["cdk-nag", "@aws-cdk/assert"],
-  peerDeps: ["cdk-nag@^2.28.159", "aws-cdk-lib"],
+  peerDeps: ["cdk-nag@^2.34.23", "aws-cdk-lib"],
   keywords: ["aws", "cdk", "cdk-nag", "custom-nag-pack"],
 });
 project.synth();

@@ -1,7 +1,7 @@
 import { parse } from "path";
 import { CfnResource, TagManager } from "aws-cdk-lib";
 import { NagRuleCompliance, NagRuleResult } from "cdk-nag";
-import { Cr2TagsWithValueToCheck, CustomChecks } from "../custom-checks";
+import { Cr2TagsWithValueToCheck, CustomChecks } from "../customChecks";
 import { invokeTags } from "./utils/tagUtils";
 
 /**

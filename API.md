@@ -25,6 +25,8 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.verbose">verbose</a></code> | <code>boolean</code> | Whether or not to enable extended explanatory descriptions on warning, error, and logged ignore messages (default: false). |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks">enableAwsSolutionChecks</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressionsForCustomResource">suppressionsForCustomResource</a></code> | <code>cdk-nag.NagPackSuppression[]</code> | Suppressions for custom resources If the policy is devied from the sdk call (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrsdkwbrcallsoptions) it could be supressed with the id `AwsSolutions-IAM4` and `AwsSolutions-IAM5`, because the policy is managed by cdk. |
 
 ---
 
@@ -119,6 +121,52 @@ public readonly cr2TagsWithValueToCheck: {[ key: string ]: string[]};
 - *Type:* {[ key: string ]: string[]}
 
 ---
+
+##### `enableAwsSolutionChecks`<sup>Optional</sup> <a name="enableAwsSolutionChecks" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks"></a>
+
+```typescript
+public readonly enableAwsSolutionChecks: boolean;
+```
+
+- *Type:* boolean
+
+---
+
+##### `suppressionsForCustomResource`<sup>Optional</sup> <a name="suppressionsForCustomResource" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressionsForCustomResource"></a>
+
+```typescript
+public readonly suppressionsForCustomResource: NagPackSuppression[];
+```
+
+- *Type:* cdk-nag.NagPackSuppression[]
+
+Suppressions for custom resources If the policy is devied from the sdk call (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrsdkwbrcallsoptions) it could be supressed with the id `AwsSolutions-IAM4` and `AwsSolutions-IAM5`, because the policy is managed by cdk.
+
+If the policy is hand crafted (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrstatementsstatements), the id's `AwsSolutions-IAM4` and `AwsSolutions-IAM5` shoulc be avoided or supressed with a good reason.
+
+The id `AwsSolutions-L1` can be suppressed, because they are managed by cdk. `AwsSolutions-L1` only in the timeframe when a new runtime is released and it's not yet used by the custom runtime.
+
+---
+
+*Example*
+
+```typescript
+[
+  {
+    id: 'AwsSolutions-IAM4',
+    reason: 'cdk managed policy',
+  },
+  {
+    id: 'AwsSolutions-IAM5',
+    reason: 'cdk managed policy',
+  },
+  {
+    id: 'AwsSolutions-L1',
+    reason: 'cdk managed lambda function runtime',
+  },
+],
+```
+
 
 ## Classes <a name="Classes" id="Classes"></a>
 

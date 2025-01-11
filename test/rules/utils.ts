@@ -10,7 +10,7 @@ import {
   NagRuleResult,
 } from "cdk-nag/lib";
 import { IConstruct } from "constructs";
-import { CustomChecks, CustomChecksProps } from "../../src/custom-checks";
+import { CustomChecks, CustomChecksProps } from "../../src/customChecks";
 
 export enum TestType {
   NON_COMPLIANCE,

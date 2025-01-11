@@ -9,17 +9,35 @@
 | CR1     | Definend tags not exist       | Certain tags are checked if it exist        |
 | CR2     | Definend tags has wrong value | Certain tags are checked with defined value |
 
-## config
+## global suppressions
 
-### CR1
+### custom resource
+
+The `AwsCustomResource` (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html) creates a singleton lambda function and can't suppress at the resource level via `addResourceSuppressions` because it creates a lambda function resource on the stack.
+
+In most cases the all the resources which ared created are managed by the CDK, so it's OK to suppress that "behind the scenes".
+
+## config
 
 ```typescript
 import { CustomChecks } from '@jaykingson/cdk-nag-custom-nag-pack'
 ...
 Aspects.of(app).add(new CustomChecks({
-    // use whatever tags you want to check
+  // use the whole set of this rules https://github.com/cdklabs/cdk-nag/blob/main/RULES.md#awssolutions
+  enableAwsSolutionChecks: true,
+  // use whatever tags you want to check
   cr1TagsToCheck: ['Environment', 'Owner'],
   cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },
+  suppressionsForCustomResource: [
+    {
+      id: 'AwsSolutions-IAM4',
+      reason: 'CDK managed policy is used'
+    },
+    {
+      id: 'AwsSolutions-IAM5',
+      reason: 'CDK managed policy is used'
+    }
+  ]
 }));
 ```
 

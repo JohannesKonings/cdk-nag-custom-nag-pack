@@ -28,16 +28,8 @@ Aspects.of(app).add(new CustomChecks({
   // use whatever tags you want to check
   cr1TagsToCheck: ['Environment', 'Owner'],
   cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },
-  suppressionsForCustomResource: [
-    {
-      id: 'AwsSolutions-IAM4',
-      reason: 'CDK managed policy is used'
-    },
-    {
-      id: 'AwsSolutions-IAM5',
-      reason: 'CDK managed policy is used'
-    }
-  ]
+  // activate the suppression of the custom resource singleton lambda
+  suppressSingletonLambdaFindings: true,
 }));
 ```
 

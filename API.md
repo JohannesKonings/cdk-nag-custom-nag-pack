@@ -26,7 +26,7 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks">enableAwsSolutionChecks</a></code> | <code>boolean</code> | *No description.* |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressionsForCustomResource">suppressionsForCustomResource</a></code> | <code>cdk-nag.NagPackSuppression[]</code> | Suppressions for custom resources If the policy is devied from the sdk call (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrsdkwbrcallsoptions) it could be supressed with the id `AwsSolutions-IAM4` and `AwsSolutions-IAM5`, because the policy is managed by cdk. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivaste suppressions for custom resources singleton lambda The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. |
 
 ---
 
@@ -132,41 +132,21 @@ public readonly enableAwsSolutionChecks: boolean;
 
 ---
 
-##### `suppressionsForCustomResource`<sup>Optional</sup> <a name="suppressionsForCustomResource" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressionsForCustomResource"></a>
+##### `suppressSingletonLambdaFindings`<sup>Optional</sup> <a name="suppressSingletonLambdaFindings" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings"></a>
 
 ```typescript
-public readonly suppressionsForCustomResource: NagPackSuppression[];
+public readonly suppressSingletonLambdaFindings: boolean;
 ```
 
-- *Type:* cdk-nag.NagPackSuppression[]
+- *Type:* boolean
+- *Default:* false - custom resource singleton lambda findings will not be suppressed
 
-Suppressions for custom resources If the policy is devied from the sdk call (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrsdkwbrcallsoptions) it could be supressed with the id `AwsSolutions-IAM4` and `AwsSolutions-IAM5`, because the policy is managed by cdk.
+Deactivaste suppressions for custom resources singleton lambda The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true.
 
-If the policy is hand crafted (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResourcePolicy.html#static-fromwbrstatementsstatements), the id's `AwsSolutions-IAM4` and `AwsSolutions-IAM5` shoulc be avoided or supressed with a good reason.
-
-The id `AwsSolutions-L1` can be suppressed, because they are managed by cdk. `AwsSolutions-L1` only in the timeframe when a new runtime is released and it's not yet used by the custom runtime.
+All this is managed by cdk.
+All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
 
 ---
-
-*Example*
-
-```typescript
-[
-  {
-    id: 'AwsSolutions-IAM4',
-    reason: 'cdk managed policy',
-  },
-  {
-    id: 'AwsSolutions-IAM5',
-    reason: 'cdk managed policy',
-  },
-  {
-    id: 'AwsSolutions-L1',
-    reason: 'cdk managed lambda function runtime',
-  },
-],
-```
-
 
 ## Classes <a name="Classes" id="Classes"></a>
 

@@ -2,9 +2,9 @@ import { Tags as cdkLibTags } from "aws-cdk-lib";
 import { CfnGlobalTable } from "aws-cdk-lib/aws-dynamodb";
 import { Bucket, CfnBucket } from "aws-cdk-lib/aws-s3";
 import { Aspects, Stack } from "aws-cdk-lib/core";
+import { test, describe, beforeEach } from "vitest";
 import { validateStack, TestType, TestPack } from "./utils";
 import { TagsWithValueExist } from "../../src/rules/index";
-
 const testPack = new TestPack([TagsWithValueExist], {
   // cr2TagsWithValueToCheck: [{ tagName: "Stage", tagValue: ["dev", "prod"] }],
   cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },

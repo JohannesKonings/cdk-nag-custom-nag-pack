@@ -30,9 +30,7 @@ jspm_packages/
 *.tgz
 .yarn-integrity
 .cache
-/test-reports/
-junit.xml
-/coverage/
+test-reports
 !/.github/workflows/build.yml
 /dist/changelog.md
 /dist/version.txt
@@ -52,4 +50,6 @@ junit.xml
 .jsii
 tsconfig.json
 !/API.md
+/coverage/
+!/vitest.config.ts
 !/.projenrc.ts

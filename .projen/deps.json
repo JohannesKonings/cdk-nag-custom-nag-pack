@@ -5,7 +5,7 @@
       "type": "build"
     },
     {
-      "name": "@types/jest",
+      "name": "@nikovirtala/projen-vitest",
       "type": "build"
     },
     {
@@ -53,15 +53,6 @@
       "type": "build"
     },
     {
-      "name": "jest",
-      "type": "build"
-    },
-    {
-      "name": "jest-junit",
-      "version": "^16",
-      "type": "build"
-    },
-    {
       "name": "jsii-diff",
       "type": "build"
     },
@@ -93,16 +84,22 @@
       "type": "build"
     },
     {
-      "name": "ts-jest",
-      "type": "build"
-    },
-    {
       "name": "ts-node",
       "type": "build"
     },
     {
       "name": "typescript",
       "type": "build"
+    },
+    {
+      "name": "vitest",
+      "version": "^2",
+      "type": "build"
+    },
+    {
+      "name": "@vitest/coverage-v8",
+      "version": "^2",
+      "type": "devenv"
     },
     {
       "name": "aws-cdk-lib",

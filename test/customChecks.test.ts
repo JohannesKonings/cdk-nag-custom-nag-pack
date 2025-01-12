@@ -5,6 +5,7 @@ import {
   AwsCustomResourcePolicy,
   PhysicalResourceId,
 } from "aws-cdk-lib/custom-resources";
+import { test, describe } from "vitest";
 import { CustomChecks } from "../src/customChecks";
 
 describe("custom resource suppressions", () => {

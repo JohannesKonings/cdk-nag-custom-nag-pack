@@ -10,6 +10,7 @@ import {
   NagRuleResult,
 } from "cdk-nag/lib";
 import { IConstruct } from "constructs";
+import { expect } from "vitest";
 import { CustomChecks, CustomChecksProps } from "../../src/customChecks";
 
 export enum TestType {

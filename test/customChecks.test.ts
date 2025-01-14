@@ -174,7 +174,7 @@ describe("Custom resource suppressions", () => {
 
     Annotations.fromStack(stack).hasError("*", Match.anyValue());
   });
-  test("Compliance: Active and supression per log retention", () => {
+  test("Compliance: Active and log retention singleton lambda will also be suppressed", () => {
     const stack = new Stack();
     Aspects.of(stack).add(
       new CustomChecks({
@@ -194,6 +194,7 @@ describe("Custom resource suppressions", () => {
         physicalResourceId: PhysicalResourceId.of(Date.now().toString()),
       },
       installLatestAwsSdk: false,
+      // Log retention is set
       logRetention: 1,
       policy: AwsCustomResourcePolicy.fromSdkCalls({
         resources: AwsCustomResourcePolicy.ANY_RESOURCE,

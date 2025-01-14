@@ -144,6 +144,7 @@ public readonly suppressSingletonLambdaFindings: boolean;
 Deactivaste suppressions for custom resources singleton lambda The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true.
 
 All this is managed by cdk.
+Supress for Custom::AWS itself and also for Custom::LogRetention, if the log retention is set.
 All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
 
 ---

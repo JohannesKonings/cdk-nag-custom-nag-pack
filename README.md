@@ -17,6 +17,9 @@ The `AwsCustomResource` (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib
 
 In most cases the all the resources which ared created are managed by the CDK, so it's OK to suppress that "behind the scenes".
 
+![custom resource template](./docs/custom-resources.png)
+
+
 ## config
 
 ```typescript

@@ -26,6 +26,7 @@ export interface CustomChecksProps extends NagPackProps {
   /**
    * Deactivaste suppressions for custom resources singleton lambda
    * The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. All this is managed by cdk.
+   * Supress for Custom::AWS itself and also for Custom::LogRetention, if the log retention is set.
    * All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
    * @default false - custom resource singleton lambda findings will not be suppressed
    */
@@ -87,7 +88,7 @@ export class CustomChecks extends NagPack {
     });
   }
   private suppressCustomResource(stack: Stack): void {
-    const suppressions: NagPackSuppression[] = [
+    const suppressionsCustomResource: NagPackSuppression[] = [
       {
         id: "AwsSolutions-IAM4",
         reason: "Custom resource singleton lambda",
@@ -97,13 +98,36 @@ export class CustomChecks extends NagPack {
         reason: "Custom resource singleton lambda",
       },
     ];
+    const suppressionsLogRetention: NagPackSuppression[] = [
+      {
+        id: "AwsSolutions-L1",
+        reason: "Log retention custom resource",
+      },
+      {
+        id: "AwsSolutions-IAM4",
+        reason: "Log retention custom resource",
+      },
+      {
+        id: "AwsSolutions-IAM5",
+        reason: "Log retention custom resource",
+      },
+    ];
     // uuid of the custom resource https://github.com/aws/aws-cdk/blob/93172033e4a8346a86ee00017acba57b57f22aab/packages/aws-cdk-lib/custom-resources/lib/aws-custom-resource/aws-custom-resource.ts#L448
+    // https://github.com/aws/aws-cdk/issues/23204
     const customResourceId = `AWS${AwsCustomResource.PROVIDER_FUNCTION_UUID.split("-").join("")}`;
+    // https://github.com/aws/aws-cdk/blob/c7d6fb696c0d9a728ff0027c775fbf7750eec787/packages/aws-cdk-lib/aws-logs/lib/log-retention.ts#L128
+    const logRetentionFunctionId =
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a";
     const stackName = stack.stackName;
     // all possible paths, which a custom resource creates and will be nagged by cdk-nag
     const cutomResourceSuppressPaths = new Set([
       `/${stackName}/${customResourceId}/ServiceRole/Resource`,
       `/${stackName}/${customResourceId}/Resource`,
+    ]);
+    const logRetentionSuppressPaths = new Set([
+      `/${stackName}/${logRetentionFunctionId}/ServiceRole/DefaultPolicy/Resource`,
+      `/${stackName}/${logRetentionFunctionId}/ServiceRole/Resource`,
+      `/${stackName}/${logRetentionFunctionId}/Resource`,
     ]);
 
     const allExistingPaths = new Set(
@@ -116,7 +140,17 @@ export class CustomChecks extends NagPack {
         NagSuppressions.addResourceSuppressionsByPath(
           stack,
           path,
-          suppressions,
+          suppressionsCustomResource,
+          true,
+        );
+      }
+    }
+    for (const path of logRetentionSuppressPaths) {
+      if (allExistingPaths.has(path)) {
+        NagSuppressions.addResourceSuppressionsByPath(
+          stack,
+          path,
+          suppressionsLogRetention,
           true,
         );
       }

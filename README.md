@@ -19,6 +19,12 @@ In most cases the all the resources which ared created are managed by the CDK, s
 
 ![custom resource template](./docs/custom-resources.png)
 
+The same applies to `BucketDeployment` (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_s3_deployment-readme.html). 
+
+Handled custom resource types:
+* `Custom::AWS`
+* `Custom::LogRetention`
+* `Custom::CDKBucketDeployment`
 
 ## config
 

@@ -26,7 +26,7 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks">enableAwsSolutionChecks</a></code> | <code>boolean</code> | *No description.* |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivaste suppressions for custom resources singleton lambda The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivaste suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. |
 
 ---
 
@@ -141,10 +141,11 @@ public readonly suppressSingletonLambdaFindings: boolean;
 - *Type:* boolean
 - *Default:* false - custom resource singleton lambda findings will not be suppressed
 
-Deactivaste suppressions for custom resources singleton lambda The id's `AwsSolutions-L1` and `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true.
+Deactivaste suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true.
 
 All this is managed by cdk.
 Supress for Custom::AWS itself and also for Custom::LogRetention, if the log retention is set.
+Suppress for Custom::CDKBucketDeployment, if the bucket deployment is in place.
 All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
 
 ---

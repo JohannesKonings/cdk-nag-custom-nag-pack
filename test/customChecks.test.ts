@@ -1,5 +1,7 @@
 import { Annotations, Match } from "aws-cdk-lib/assertions";
 import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { Bucket } from "aws-cdk-lib/aws-s3";
+import { BucketDeployment } from "aws-cdk-lib/aws-s3-deployment";
 import { Aspects, Stack } from "aws-cdk-lib/core";
 import {
   AwsCustomResource,
@@ -210,6 +212,38 @@ describe("Custom resource suppressions", () => {
       ],
       true,
     );
+
+    Annotations.fromStack(stack).hasNoError("*", Match.anyValue());
+  });
+
+  test("Compliance: Active and s3 deployment singleton lambda will also be suppressed", () => {
+    const stack = new Stack();
+    Aspects.of(stack).add(
+      new CustomChecks({
+        enableAwsSolutionChecks: true,
+        suppressSingletonLambdaFindings: true,
+      }),
+    );
+
+    const bucket = new Bucket(stack, "rBucket");
+    NagSuppressions.addResourceSuppressions(
+      bucket,
+      [
+        {
+          id: "AwsSolutions-S1",
+          reason: "not test related",
+        },
+        {
+          id: "AwsSolutions-S10",
+          reason: "not test related",
+        },
+      ],
+      true,
+    );
+    new BucketDeployment(stack, "rBucketDeployment", {
+      sources: [],
+      destinationBucket: bucket,
+    });
 
     Annotations.fromStack(stack).hasNoError("*", Match.anyValue());
   });

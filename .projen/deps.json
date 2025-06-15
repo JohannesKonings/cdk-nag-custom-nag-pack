@@ -27,6 +27,10 @@
       "type": "build"
     },
     {
+      "name": "cdk-sops-secrets",
+      "type": "build"
+    },
+    {
       "name": "commit-and-tag-version",
       "version": "^12",
       "type": "build"
@@ -67,12 +71,12 @@
     },
     {
       "name": "jsii-rosetta",
-      "version": "~5.4.0",
+      "version": "~5.8.0",
       "type": "build"
     },
     {
       "name": "jsii",
-      "version": "~5.4.0",
+      "version": "~5.8.0",
       "type": "build"
     },
     {
@@ -93,12 +97,12 @@
     },
     {
       "name": "vitest",
-      "version": "^2",
+      "version": "^3",
       "type": "build"
     },
     {
       "name": "@vitest/coverage-v8",
-      "version": "^2",
+      "version": "^3",
       "type": "devenv"
     },
     {
@@ -108,7 +112,7 @@
     },
     {
       "name": "cdk-nag",
-      "version": "^2.34.23",
+      "version": "^2.36.18",
       "type": "peer"
     },
     {

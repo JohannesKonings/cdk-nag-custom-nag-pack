@@ -25,6 +25,8 @@ Handled custom resource types:
 * `Custom::AWS`
 * `Custom::LogRetention`
 * `Custom::CDKBucketDeployment`
+* `Custom::S3BucketNotifications`
+* `Custom::SopsSync`
 
 ## config
 

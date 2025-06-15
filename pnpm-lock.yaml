@@ -66,8 +66,8 @@ importers:
         specifier: ^10.5.0
         version: 10.7.4(jsii-rosetta@5.8.9)
       jsii-pacmak:
-        specifier: 1.106.0
-        version: 1.106.0(jsii-rosetta@5.8.9)
+        specifier: 1.112.0
+        version: 1.112.0(jsii-rosetta@5.8.9)
       jsii-rosetta:
         specifier: ~5.8.0
         version: 5.8.9
@@ -663,10 +663,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
-  '@jsii/check-node@1.106.0':
-    resolution: {integrity: sha512-/T/TUsbHdEbZRFR4Rem9+UXVvgMYncEkrIeC52oIHJ8BDSgqlDsIARio/Eu5DOftF4avSLV/sshR6n19mpK1oA==}
-    engines: {node: '>= 14.17.0'}
 
   '@jsii/check-node@1.112.0':
     resolution: {integrity: sha512-ySf6hMcWvWrMtMLKEiBN6QN46oWqKfJtOHCdy13iQXTI38SuI9Lp2PaYMLcsN10fTOvLjhbYm3jAu48xwrsKAQ==}
@@ -2528,12 +2524,12 @@ packages:
     peerDependencies:
       jsii-rosetta: ^1.85.0 || ~5.0.14 || ~5.1.2 || ~5.2.0 || ~5.3.0 || ~5.4.0 || ~5.5.0 || ~5.6.0 || ~5.7.0 || ~5.8.0
 
-  jsii-pacmak@1.106.0:
-    resolution: {integrity: sha512-cNSzPszHaFg5AYwOQhp+eM/KpOJupdeyyycrzR6AtxwSmRN6x4K7YybZY/Rk0zfqGds9ukOYv0euGLZuXzXt1w==}
+  jsii-pacmak@1.112.0:
+    resolution: {integrity: sha512-awdZ4Hb9pc8cKp2RVhJntoppgo5KnqP8f9YCmoHPPpPCS1hB3joxpVbNS6t2PYdGt1R+j7EcO7TJdah95cxE3w==}
     engines: {node: '>= 14.17.0'}
     hasBin: true
     peerDependencies:
-      jsii-rosetta: '>=5.4.0'
+      jsii-rosetta: '>=5.5.0'
 
   jsii-reflect@1.112.0:
     resolution: {integrity: sha512-B7agb4kmmtW9KHk1KJyB0AHaAs28pOt3FF/yKuDSfJyFZnqh26pbd5ok6Y5jx0qVYcaTydil7FkTF7gRwBz7nQ==}
@@ -4376,11 +4372,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
-
-  '@jsii/check-node@1.106.0':
-    dependencies:
-      chalk: 4.1.2
-      semver: 7.7.2
 
   '@jsii/check-node@1.112.0':
     dependencies:
@@ -6588,9 +6579,9 @@ snapshots:
       semver: 7.7.2
       yargs: 16.2.0
 
-  jsii-pacmak@1.106.0(jsii-rosetta@5.8.9):
+  jsii-pacmak@1.112.0(jsii-rosetta@5.8.9):
     dependencies:
-      '@jsii/check-node': 1.106.0
+      '@jsii/check-node': 1.112.0
       '@jsii/spec': 1.112.0
       clone: 2.1.2
       codemaker: 1.112.0

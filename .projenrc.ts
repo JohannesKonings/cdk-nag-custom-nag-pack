@@ -8,7 +8,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorAddress: "johannes.konings@outlook.com",
   cdkVersion: "2.156.0",
   defaultReleaseBranch: "main",
-  jsiiVersion: "~5.4.0",
+  jsiiVersion: "~5.8.0",
   name,
   packageName: `${scope}/${name}`,
   npmAccess: javascript.NpmAccess.PUBLIC,

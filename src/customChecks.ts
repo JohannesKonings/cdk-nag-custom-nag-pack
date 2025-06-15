@@ -4,7 +4,6 @@ import {
   NagPack,
   NagPackProps,
   NagMessageLevel,
-  NagPackSuppression,
   NagSuppressions,
   AwsSolutionsChecks,
 } from "cdk-nag";
@@ -26,8 +25,12 @@ export interface CustomChecksProps extends NagPackProps {
   /**
    * Deactivaste suppressions for custom resources singleton lambda
    * The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. All this is managed by cdk.
-   * Supress for Custom::AWS itself and also for Custom::LogRetention, if the log retention is set.
-   * Suppress for Custom::CDKBucketDeployment, if the bucket deployment is in place.
+   * Suppressions:
+   * * Suppress for `Custom::AWS`, if the custom resource is used in the stack.
+   * * Suppress for `Custom::AWSLogRetention`, if the log retention is set.
+   * * Suppress for `Custom::CDKBucketDeployment`, if the bucket deployment is in place.
+   * * Suppress for `Custom::S3BucketNotifications`, if the bucket notification is set.
+   * * Suppress for `Custom::SopsSync`, if the cdk-sops-secrets singleton lambda is used.
    * All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
    * @default false - custom resource singleton lambda findings will not be suppressed
    */
@@ -88,103 +91,86 @@ export class CustomChecks extends NagPack {
     });
   }
   private suppressCustomResource(stack: Stack): void {
-    const suppressionsCustomResource: NagPackSuppression[] = [
+    const singletonSuppressions = [
       {
-        id: "AwsSolutions-IAM4",
+        rules: ["AwsSolutions-IAM4", "AwsSolutions-L1"],
         reason: "Custom resource singleton lambda",
+        supressPaths: ["ServiceRole/Resource", "Resource"],
+        // UUID of the custom resource https://github.com/aws/aws-cdk/blob/93172033e4a8346a86ee00017acba57b57f22aab/packages/aws-cdk-lib/custom-resources/lib/aws-custom-resource/aws-custom-resource.ts#L448
+        // https://github.com/aws/aws-cdk/issues/23204
+        singletonId: `AWS${AwsCustomResource.PROVIDER_FUNCTION_UUID.split("-").join("")}`,
       },
       {
-        id: "AwsSolutions-L1",
-        reason: "Custom resource singleton lambda",
+        rules: ["AwsSolutions-IAM4", "AwsSolutions-IAM5", "AwsSolutions-L1"],
+        reason: "Log retention custom resource",
+        supressPaths: [
+          "ServiceRole/Resource",
+          "Resource",
+          "ServiceRole/DefaultPolicy/Resource",
+        ],
+        // https://github.com/aws/aws-cdk/blob/c7d6fb696c0d9a728ff0027c775fbf7750eec787/packages/aws-cdk-lib/aws-logs/lib/log-retention.ts#L128
+        singletonId: "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a",
+      },
+
+      {
+        rules: ["AwsSolutions-IAM4", "AwsSolutions-IAM5", "AwsSolutions-L1"],
+        reason: "S3 Bucket deployment singleton lambda",
+        supressPaths: [
+          "ServiceRole/Resource",
+          "Resource",
+          "ServiceRole/DefaultPolicy/Resource",
+        ],
+        // https://github.com/aws/aws-cdk/blob/53dc0d81e004ad1f8513af534b6d43f4315c24a3/packages/aws-cdk-lib/aws-s3-deployment/lib/bucket-deployment.ts#L599
+        singletonId:
+          "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C",
+      },
+      {
+        rules: ["AwsSolutions-IAM4", "AwsSolutions-IAM5", "AwsSolutions-L1"],
+        reason: "Bucket Notifications custom resource",
+        supressPaths: [
+          "ServiceRole/Resource",
+          "Resource",
+          "ServiceRole/DefaultPolicy/Resource",
+        ],
+        // https://github.com/aws/aws-cdk/blob/d95add33fc3fe355752ff56cd37381cb808890b6/packages/aws-cdk-lib/aws-s3/lib/notifications-resource/notifications-resource-handler.ts#L39
+        singletonId:
+          "BucketNotificationsHandler050a0587b7544547bf325f094a3db834",
+      },
+      // https://github.com/dbsystel/cdk-sops-secrets
+      {
+        rules: ["AwsSolutions-IAM4", "AwsSolutions-IAM5"],
+        reason: "cdk-sops-secrets singleton lambda",
+        supressPaths: [
+          "ServiceRole/Resource",
+          "Resource",
+          "ServiceRole/DefaultPolicy/Resource",
+        ],
+        // https://github.com/dbsystel/cdk-sops-secrets/blob/5db64f9d9fd6dafabbb2d653a73a3028d5df1a4a/src/SopsSync.ts#L192
+        singletonId: "SingletonLambdaSopsSyncProvider",
       },
     ];
-    const suppressionsLogRetention: NagPackSuppression[] = [
-      {
-        id: "AwsSolutions-L1",
-        reason: "Log retention singleton lambda",
-      },
-      {
-        id: "AwsSolutions-IAM4",
-        reason: "Log retention singleton lambda",
-      },
-      {
-        id: "AwsSolutions-IAM5",
-        reason: "Log retention singleton lambda",
-      },
-    ];
-    const suppressionsS3BucketDeployment: NagPackSuppression[] = [
-      {
-        id: "AwsSolutions-L1",
-        reason: "S3 Bucket deployment singleton lambda",
-      },
-      {
-        id: "AwsSolutions-IAM4",
-        reason: "S3 Bucket deployment singleton lambda",
-      },
-      {
-        id: "AwsSolutions-IAM5",
-        reason: "S3 Bucket deployment singleton lambda",
-      },
-    ];
-    // uuid of the custom resource https://github.com/aws/aws-cdk/blob/93172033e4a8346a86ee00017acba57b57f22aab/packages/aws-cdk-lib/custom-resources/lib/aws-custom-resource/aws-custom-resource.ts#L448
-    // https://github.com/aws/aws-cdk/issues/23204
-    const customResourceId = `AWS${AwsCustomResource.PROVIDER_FUNCTION_UUID.split("-").join("")}`;
-    // https://github.com/aws/aws-cdk/blob/c7d6fb696c0d9a728ff0027c775fbf7750eec787/packages/aws-cdk-lib/aws-logs/lib/log-retention.ts#L128
-    const logRetentionFunctionId =
-      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a";
-    // https://github.com/aws/aws-cdk/blob/53dc0d81e004ad1f8513af534b6d43f4315c24a3/packages/aws-cdk-lib/aws-s3-deployment/lib/bucket-deployment.ts#L599
-    const bucketDeploymentId =
-      "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C";
+
     const stackName = stack.stackName;
-    // all possible paths, which a custom resource creates and will be nagged by cdk-nag
-    const cutomResourceSuppressPaths = new Set([
-      `/${stackName}/${customResourceId}/ServiceRole/Resource`,
-      `/${stackName}/${customResourceId}/Resource`,
-    ]);
-    const logRetentionSuppressPaths = new Set([
-      `/${stackName}/${logRetentionFunctionId}/ServiceRole/DefaultPolicy/Resource`,
-      `/${stackName}/${logRetentionFunctionId}/ServiceRole/Resource`,
-      `/${stackName}/${logRetentionFunctionId}/Resource`,
-    ]);
-    const bucketDeploymentSuppressPaths = new Set([
-      `/${stackName}/${bucketDeploymentId}/ServiceRole/DefaultPolicy/Resource`,
-      `/${stackName}/${bucketDeploymentId}/ServiceRole/Resource`,
-      `/${stackName}/${bucketDeploymentId}/Resource`,
-    ]);
 
     const allExistingPaths = new Set(
       stack.node.findAll().map((node) => `/${node.node.path}`),
     );
 
-    for (const path of cutomResourceSuppressPaths) {
-      // Only add a suppression if the path exists
-      if (allExistingPaths.has(path)) {
-        NagSuppressions.addResourceSuppressionsByPath(
-          stack,
-          path,
-          suppressionsCustomResource,
-          true,
-        );
-      }
-    }
-    for (const path of logRetentionSuppressPaths) {
-      if (allExistingPaths.has(path)) {
-        NagSuppressions.addResourceSuppressionsByPath(
-          stack,
-          path,
-          suppressionsLogRetention,
-          true,
-        );
-      }
-    }
-    for (const path of bucketDeploymentSuppressPaths) {
-      if (allExistingPaths.has(path)) {
-        NagSuppressions.addResourceSuppressionsByPath(
-          stack,
-          path,
-          suppressionsS3BucketDeployment,
-          true,
-        );
+    for (const suppression of singletonSuppressions) {
+      for (const supressPath of suppression.supressPaths) {
+        const path = `/${stackName}/${suppression.singletonId}/${supressPath}`;
+        // Only add a suppression if the path exists
+        if (allExistingPaths.has(path)) {
+          NagSuppressions.addResourceSuppressionsByPath(
+            stack,
+            path,
+            suppression.rules.map((rule) => ({
+              id: rule,
+              reason: suppression.reason,
+            })),
+            true,
+          );
+        }
       }
     }
   }

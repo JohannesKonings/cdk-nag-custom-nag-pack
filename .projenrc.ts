@@ -17,8 +17,14 @@ const project = new awscdk.AwsCdkConstructLibrary({
   repositoryUrl: "git@github.com:JohannesKonings/cdk-nag-custom-nag-pack.git",
   prettier: true,
   deps: [],
-  devDeps: ["cdk-nag", "@aws-cdk/assert", "@nikovirtala/projen-vitest"],
-  peerDeps: ["cdk-nag@^2.34.23", "aws-cdk-lib"],
+  devDeps: [
+    "cdk-nag",
+    "@aws-cdk/assert",
+    "@nikovirtala/projen-vitest",
+    // for unit tests
+    "cdk-sops-secrets",
+  ],
+  peerDeps: ["cdk-nag@^2.36.18", "aws-cdk-lib"],
   keywords: ["aws", "cdk", "cdk-nag", "custom-nag-pack"],
   jest: false,
   gitignore: ["test-reports"],

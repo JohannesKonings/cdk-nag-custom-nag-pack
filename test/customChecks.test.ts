@@ -292,7 +292,7 @@ describe("Custom resource suppressions", () => {
     Annotations.fromStack(stack).hasNoError("*", Match.anyValue());
   });
 
-  test("Compliance: Active and supression for cdk sops snycing singleton lambda", () => {
+  test("Compliance: Active and suppression for cdk sops syncing singleton lambda", () => {
     const stack = new Stack();
     Aspects.of(stack).add(
       new CustomChecks({

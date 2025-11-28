@@ -26,7 +26,7 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks">enableAwsSolutionChecks</a></code> | <code>boolean</code> | *No description.* |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivaste suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivate suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed if the parameter is set to true. |
 
 ---
 
@@ -141,9 +141,9 @@ public readonly suppressSingletonLambdaFindings: boolean;
 - *Type:* boolean
 - *Default:* false - custom resource singleton lambda findings will not be suppressed
 
-Deactivaste suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true.
+Deactivate suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed if the parameter is set to true.
 
-All this is managed by cdk.
+All this is managed by CDK.
 Suppressions:
 * Suppress for `Custom::AWS`, if the custom resource is used in the stack.
 * Suppress for `Custom::AWSLogRetention`, if the log retention is set.

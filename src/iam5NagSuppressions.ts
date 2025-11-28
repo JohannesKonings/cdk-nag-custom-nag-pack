@@ -1,5 +1,9 @@
 import { Stack } from "aws-cdk-lib";
-import { CfnPolicy, Effect, type PolicyStatementProps } from "aws-cdk-lib/aws-iam";
+import {
+  CfnPolicy,
+  Effect,
+  type PolicyStatementProps,
+} from "aws-cdk-lib/aws-iam";
 import { NagSuppressions } from "cdk-nag";
 import type { IConstruct } from "constructs";
 

@@ -28,6 +28,45 @@ Handled custom resource types:
 * `Custom::S3BucketNotifications`
 * `Custom::SopsSync`
 
+## granular AwsSolutions-IAM5 suppressions
+
+The `AwsSolutions-IAM5` rule flags IAM policies that use wildcard permissions (`*`) in actions or resources. While wildcards should generally be avoided, some AWS services require them for proper functionality (e.g., X-Ray tracing).
+
+This package provides `Iam5NagSuppressions.addIam5StatementResourceSuppressions()` for **granular suppression** of specific IAM policy statements. Instead of suppressing all IAM5 findings for a resource, you can suppress only the exact policy statements that genuinely require wildcards.
+
+### How it works
+
+The method compares the actual IAM policy statements attached to a resource against the policy statements you specify in `appliesTo`. It will **only** suppress the `AwsSolutions-IAM5` finding if:
+
+1. All wildcard-containing statements in the resource's policy have a matching entry in `appliesTo`
+2. The statements match exactly (same Effect, Actions, and Resources)
+
+If any wildcard statement doesn't match an `appliesTo` entry, the suppression is **not applied** and cdk-nag will still flag the finding.
+
+### Example usage
+
+```typescript
+import { Iam5NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+
+const policyStatementForSuppression: PolicyStatementProps = {
+  actions: ['xray:PutTelemetryRecords', 'xray:PutTraceSegments'],
+  resources: ['*'],
+  effect: Effect.ALLOW,
+};
+
+Iam5NagSuppressions.addIam5StatementResourceSuppressions(
+  lambda,
+  {
+    id: 'AwsSolutions-IAM5',
+    reason: 'Wildcard required for X-Ray - see https://docs.aws.amazon.com/xray/latest/devguide/security_iam_service-with-iam.html',
+    appliesTo: [policyStatementForSuppression],
+  },
+  true, // applyToChildren
+);
+```
+
+This approach ensures you only suppress the specific wildcard permissions you've intentionally reviewed and approved, while catching any unintended wildcards that might be added later.
+
 ## config
 
 ```typescript

@@ -118,8 +118,6 @@ describe("Iam5NagSuppressions for IAM pattern suppression", () => {
       true,
     );
 
-    console.log("DEBUG OUTPUT:");
-    console.log(JSON.stringify(Annotations.fromStack(stack), undefined, 2));
     Annotations.fromStack(stack).hasError("*", Match.anyValue());
   });
   test("Non-Compliant if wildcard policy statement is NOT equal to appliesTo", () => {

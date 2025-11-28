@@ -4,10 +4,10 @@
 
 ## rules
 
-| Rule ID | Cause                         | Explanation                                 |
-| ------- | ----------------------------- | ------------------------------------------- |
-| CR1     | Definend tags not exist       | Certain tags are checked if it exist        |
-| CR2     | Definend tags has wrong value | Certain tags are checked with defined value |
+| Rule ID | Cause                         | Explanation                                  |
+| ------- | ----------------------------- | -------------------------------------------- |
+| CR1     | Defined tags do not exist     | Certain tags are checked for existence       |
+| CR2     | Defined tags have wrong value | Certain tags are checked with defined values |
 
 ## global suppressions
 
@@ -15,7 +15,7 @@
 
 The `AwsCustomResource` (https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html) creates a singleton lambda function and can't suppress at the resource level via `addResourceSuppressions` because it creates a lambda function resource on the stack.
 
-In most cases the all the resources which ared created are managed by the CDK, so it's OK to suppress that "behind the scenes".
+In most cases, all the resources which are created are managed by the CDK, so it's OK to suppress that "behind the scenes".
 
 ![custom resource template](./docs/custom-resources.png)
 

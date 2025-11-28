@@ -5,8 +5,12 @@ import { Cr1TagsToCheck, CustomChecks } from "../customChecks";
 import { invokeTags } from "./utils/tagUtils";
 
 /**
- * Check for existing Tags
- * @param node the CfnResource to check
+ * Check for existing tags on a CloudFormation resource.
+ * Validates that all required tags defined in cr1TagsToCheck are present
+ * on either the resource level or stack level.
+ *
+ * @param node - The CfnResource to check for required tags
+ * @returns NagRuleResult indicating compliance status
  */
 export default Object.defineProperty(
   (node: CfnResource): NagRuleResult => {

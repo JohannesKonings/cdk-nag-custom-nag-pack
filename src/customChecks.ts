@@ -23,8 +23,8 @@ export interface CustomChecksProps extends NagPackProps {
   readonly cr1TagsToCheck?: Cr1TagsToCheck;
   readonly cr2TagsWithValueToCheck?: Cr2TagsWithValueToCheck;
   /**
-   * Deactivaste suppressions for custom resources singleton lambda
-   * The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed suppressed if the parameter is set to true. All this is managed by cdk.
+   * Deactivate suppressions for custom resources singleton lambda
+   * The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed if the parameter is set to true. All this is managed by CDK.
    * Suppressions:
    * * Suppress for `Custom::AWS`, if the custom resource is used in the stack.
    * * Suppress for `Custom::AWSLogRetention`, if the log retention is set.
@@ -73,8 +73,8 @@ export class CustomChecks extends NagPack {
   private checkTagsExist(node: CfnResource): void {
     this.applyRule({
       ruleSuffixOverride: "CR1",
-      info: "Definend tags not exist.",
-      explanation: "Certain tags are checked if it exist",
+      info: "Defined tags do not exist.",
+      explanation: "Certain tags are checked for existence",
       level: NagMessageLevel.WARN,
       rule: TagsExist,
       node: node,
@@ -83,8 +83,8 @@ export class CustomChecks extends NagPack {
   private checkTagsWithValueExist(node: CfnResource): void {
     this.applyRule({
       ruleSuffixOverride: "CR2",
-      info: "Definend tags has wrong value.",
-      explanation: "Certain tags are checked with defined value",
+      info: "Defined tags have wrong value.",
+      explanation: "Certain tags are checked with defined values",
       level: NagMessageLevel.WARN,
       rule: TagsWithValueExist,
       node: node,

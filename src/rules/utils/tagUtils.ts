@@ -1,9 +1,16 @@
 import { Annotations, Aspects, IAspect, Stage, Tag } from "aws-cdk-lib";
 import { IConstruct } from "constructs";
-// Recursively Invoke Tag aspects
-// This code is completely copied from the CDK source code except for filtering for Tag aspects
-// Source:
-// https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/core/lib/private/synthesis.ts#L217
+
+/**
+ * Recursively invoke Tag aspects on a construct tree.
+ *
+ * This ensures that all Tag aspects are applied before checking tag compliance.
+ * The code is adapted from the CDK source code, filtered to only process Tag aspects.
+ *
+ * @param root - The root construct to start invoking tags from
+ *
+ * @see https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/core/lib/private/synthesis.ts#L217
+ */
 function invokeTags(root: IConstruct) {
   const invokedByPath: { [nodePath: string]: IAspect[] } = {};
 

@@ -97,22 +97,21 @@
     },
     {
       "name": "vitest",
-      "version": "^3",
+      "version": "^4",
       "type": "build"
     },
     {
       "name": "@vitest/coverage-v8",
-      "version": "^3",
+      "version": "^4",
       "type": "devenv"
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.156.0",
+      "version": "^2.176.0",
       "type": "peer"
     },
     {
       "name": "cdk-nag",
-      "version": "^2.36.18",
       "type": "peer"
     },
     {

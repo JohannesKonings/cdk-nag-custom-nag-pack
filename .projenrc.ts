@@ -6,7 +6,7 @@ const scope = "@jaykingson";
 const project = new awscdk.AwsCdkConstructLibrary({
   author: "Johannes Konings",
   authorAddress: "johannes.konings@outlook.com",
-  cdkVersion: "2.156.0",
+  cdkVersion: "2.176.0",
   defaultReleaseBranch: "main",
   jsiiVersion: "~5.8.0",
   name,
@@ -24,7 +24,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
     // for unit tests
     "cdk-sops-secrets",
   ],
-  peerDeps: ["cdk-nag@^2.36.18", "aws-cdk-lib"],
+  peerDeps: ["cdk-nag", "aws-cdk-lib"],
   keywords: ["aws", "cdk", "cdk-nag", "custom-nag-pack"],
   jest: false,
   gitignore: ["test-reports"],

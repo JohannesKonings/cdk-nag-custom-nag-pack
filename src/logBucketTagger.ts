@@ -408,14 +408,6 @@ export class LogBucketTagger implements IAspect {
     if (isCfnFnGetAtt(value)) {
       return value["Fn::GetAtt"][0];
     }
-    // String that might be a resolved reference
-    if (typeof value === "string") {
-      // Check if it's a token reference pattern
-      const refMatch = value.match(/\$\{Token\[([^\]]+)\]/);
-      if (refMatch) {
-        return refMatch[1];
-      }
-    }
     return undefined;
   }
 }

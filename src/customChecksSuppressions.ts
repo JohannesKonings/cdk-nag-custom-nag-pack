@@ -7,6 +7,8 @@ import {
 import { NagSuppressions } from "cdk-nag";
 import type { IConstruct } from "constructs";
 
+import { LogBucketTagger } from "./logBucketTagger";
+
 type IamPolicyDocument = {
   Statement?: IamPolicyStatement[];
 };
@@ -20,25 +22,18 @@ type IamPolicyStatement = {
 /**
  * Normalize a field value to a sorted array of unique strings.
  * Handles both string and string array inputs for consistent comparison.
- *
- * @param value - A string or array of strings to normalize
- * @returns A sorted array of unique strings
  */
 function normalizeField(value: string | string[]): string[] {
   if (typeof value === "string") {
     return [value];
   }
-  // Remove duplicates and sort using localeCompare for reliable alphabetical order
+
   return [...new Set(value)].sort((a, b) => a.localeCompare(b));
 }
 
 /**
  * Compare two IAM policy statements for equality.
  * Compares Effect, Action, and Resource fields after normalization.
- *
- * @param statement1 - First policy statement to compare
- * @param statement2 - Second policy statement to compare
- * @returns True if statements are equivalent, false otherwise
  */
 function compareStatements(
   statement1: IamPolicyStatement,
@@ -58,7 +53,109 @@ function compareStatements(
   return true;
 }
 
-export class Iam5NagSuppressions extends NagSuppressions {
+/**
+ * Reason used for log bucket S1 suppression
+ */
+export const LOG_BUCKET_S1_SUPPRESSION_REASON =
+  "This is intended to be a log bucket. Log bucket does not require access logging to prevent infinite loop";
+
+export interface LogBucketS1SuppressionAndTagProps {
+  /** Optional custom reason for the suppression. */
+  readonly reason?: string;
+
+  /** Tag name indicating the bucket is a log bucket. @default "isLogBucket" */
+  readonly logBucketTagName?: string;
+  /** Tag value for log bucket indicator. @default "true" */
+  readonly logBucketTagValue?: string;
+
+  /** Tag name indicating who tagged the bucket. @default "LogBucketTaggedBy" */
+  readonly taggedByTagName?: string;
+  /** Tag value for the tagged by indicator. @default "cdkNagCustomChecks" */
+  readonly taggedByTagValue?: string;
+}
+
+export interface Iam5StatementResourceSuppressionsProps {
+  /** The cdk-nag rule ID (typically 'AwsSolutions-IAM5'). */
+  readonly id: string;
+
+  /** Explanation for why the suppression is acceptable. */
+  readonly reason: string;
+
+  /** Policy statements that are allowed to contain wildcards. */
+  readonly appliesTo: PolicyStatementProps[];
+}
+
+/**
+ * Consolidated suppression utilities for cdk-nag custom checks.
+ *
+ * This class provides suppression helper methods for custom checks,
+ * including log bucket suppressions and IAM5 granular suppressions.
+ *
+ * @example
+ * import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack';
+ *
+ * // Suppress S1 for a log bucket
+ * CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(logBucket);
+ */
+export class CustomChecksSuppressions {
+  /**
+   * Suppress AwsSolutions-S1 finding for a log bucket and tag it as a log bucket.
+   *
+   * Log buckets cannot have their own server access logging enabled as that would
+   * create an infinite recursion loop. This method suppresses the S1 finding
+   * with an appropriate explanation.
+   *
+   * This suppression is automatically applied by `LogBucketTagger` when
+   * `enableLogBucketTagger` is set to true in CustomChecks.
+   *
+   * @param bucket - The S3 bucket construct that is used as a log bucket
+   * @param props - Optional suppression reason and tag configuration
+   *
+   * @example
+   * import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack';
+   *
+   * const logBucket = new Bucket(stack, 'LogBucket');
+   *
+   * // Mark a bucket as log bucket (tags + suppresses AwsSolutions-S1)
+   * CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(logBucket);
+   */
+  static addS1SuppressionAndTagAsLogBucket(
+    bucket: IConstruct,
+    props?: LogBucketS1SuppressionAndTagProps,
+  ): void {
+    const reason = props?.reason ?? LOG_BUCKET_S1_SUPPRESSION_REASON;
+
+    LogBucketTagger.tagAsLogBucket(bucket, {
+      logBucketTagName: props?.logBucketTagName,
+      logBucketTagValue: props?.logBucketTagValue,
+      taggedByTagName: props?.taggedByTagName,
+      taggedByTagValue: props?.taggedByTagValue,
+    });
+
+    NagSuppressions.addResourceSuppressions(
+      bucket,
+      [
+        {
+          id: "AwsSolutions-S1",
+          reason,
+        },
+      ],
+      false, // bucket-only, do not apply to children
+    );
+  }
+
+  /**
+   * @deprecated Use `addS1SuppressionAndTagAsLogBucket()`.
+   */
+  static addLogBucketS1Suppression(
+    bucket: IConstruct,
+    reason: string = LOG_BUCKET_S1_SUPPRESSION_REASON,
+  ): void {
+    CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(bucket, {
+      reason,
+    });
+  }
+
   /**
    * Granularly suppress AwsSolutions-IAM5 findings for specific IAM policy statements.
    *
@@ -68,43 +165,16 @@ export class Iam5NagSuppressions extends NagSuppressions {
    *
    * @param resource - The CDK construct to suppress findings for (typically a Lambda, Role, etc.)
    * @param suppressions - Suppression configuration object
-   * @param suppressions.id - The cdk-nag rule ID (typically 'AwsSolutions-IAM5')
-   * @param suppressions.reason - Explanation for why the suppression is acceptable
-   * @param suppressions.appliesTo - Array of policy statements that are allowed to contain wildcards
    * @param applyToChildren - Whether to apply suppressions to child constructs (default: false)
-   *
-   * @example
-   * ```typescript
-   * const policyStatementForSuppression: PolicyStatementProps = {
-   *   actions: ['xray:PutTelemetryRecords', 'xray:PutTraceSegments'],
-   *   resources: ['*'],
-   *   effect: Effect.ALLOW,
-   * };
-   *
-   * Iam5NagSuppressions.addIam5StatementResourceSuppressions(
-   *   lambda,
-   *   {
-   *     id: 'AwsSolutions-IAM5',
-   *     reason: 'Wildcard required for X-Ray - see https://docs.aws.amazon.com/xray/latest/devguide/security_iam_service-with-iam.html',
-   *     appliesTo: [policyStatementForSuppression],
-   *   },
-   *   true,
-   * );
-   * ```
    */
   static addIam5StatementResourceSuppressions(
     resource: IConstruct,
-    suppressions: {
-      id: string;
-      reason: string;
-      appliesTo: PolicyStatementProps[];
-    },
+    suppressions: Iam5StatementResourceSuppressionsProps,
     applyToChildren = false,
-  ) {
+  ): void {
     for (const child of resource.node.findAll()) {
       // https://github.com/cdklabs/cdk-nag/blob/bfaff5f722b119fa4f38c0706dd848ad47fd98c8/src/rules/iam/IAMNoWildcardPermissions.ts#L71C7-L71C21
       if (child instanceof CfnPolicy) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const policyDocument: IamPolicyDocument = Stack.of(child).resolve(
           child.policyDocument,
         );

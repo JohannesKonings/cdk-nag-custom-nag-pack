@@ -26,6 +26,7 @@ const customChecksProps: CustomChecksProps = { ... }
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr1TagsToCheck">cr1TagsToCheck</a></code> | <code>string[]</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.cr2TagsWithValueToCheck">cr2TagsWithValueToCheck</a></code> | <code>{[ key: string ]: string[]}</code> | *No description.* |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableAwsSolutionChecks">enableAwsSolutionChecks</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableLogBucketTagger">enableLogBucketTagger</a></code> | <code>boolean</code> | Enable automatic tagging of S3 log buckets for third-party security scanners. |
 | <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings">suppressSingletonLambdaFindings</a></code> | <code>boolean</code> | Deactivate suppressions for custom resources singleton lambda The id's like `AwsSolutions-L1` or `AwsSolutions-IAM4` will be suppressed if the parameter is set to true. |
 
 ---
@@ -132,6 +133,28 @@ public readonly enableAwsSolutionChecks: boolean;
 
 ---
 
+##### `enableLogBucketTagger`<sup>Optional</sup> <a name="enableLogBucketTagger" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.enableLogBucketTagger"></a>
+
+```typescript
+public readonly enableLogBucketTagger: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - log buckets will not be automatically tagged
+
+Enable automatic tagging of S3 log buckets for third-party security scanners.
+
+Security scanners often flag buckets without server access logging enabled, but log buckets
+themselves cannot have their own log bucket (that would create infinite recursion).
+When enabled, buckets used as logging destinations will be tagged with:
+- `isLogBucket: "true"` - identifies the bucket as a log bucket
+- `LogBucketTaggedBy: "cdkNagCustomChecks"` - identifies who applied the tag
+
+This allows security scanners to identify and exclude log buckets from "missing logging" checks.
+Supports cross-stack references when applied at App level.
+
+---
+
 ##### `suppressSingletonLambdaFindings`<sup>Optional</sup> <a name="suppressSingletonLambdaFindings" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksProps.property.suppressSingletonLambdaFindings"></a>
 
 ```typescript
@@ -151,6 +174,148 @@ Suppressions:
 * Suppress for `Custom::S3BucketNotifications`, if the bucket notification is set.
 * Suppress for `Custom::SopsSync`, if the cdk-sops-secrets singleton lambda is used.
 All other findings have to be suppressed directly via `NagSuppressions.addResourceSuppressions`
+
+---
+
+### Iam5StatementResourceSuppressionsProps <a name="Iam5StatementResourceSuppressionsProps" id="@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps"></a>
+
+#### Initializer <a name="Initializer" id="@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.Initializer"></a>
+
+```typescript
+import { Iam5StatementResourceSuppressionsProps } from '@jaykingson/cdk-nag-custom-nag-pack'
+
+const iam5StatementResourceSuppressionsProps: Iam5StatementResourceSuppressionsProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.appliesTo">appliesTo</a></code> | <code>aws-cdk-lib.aws_iam.PolicyStatementProps[]</code> | Policy statements that are allowed to contain wildcards. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.id">id</a></code> | <code>string</code> | The cdk-nag rule ID (typically 'AwsSolutions-IAM5'). |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.reason">reason</a></code> | <code>string</code> | Explanation for why the suppression is acceptable. |
+
+---
+
+##### `appliesTo`<sup>Required</sup> <a name="appliesTo" id="@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.appliesTo"></a>
+
+```typescript
+public readonly appliesTo: PolicyStatementProps[];
+```
+
+- *Type:* aws-cdk-lib.aws_iam.PolicyStatementProps[]
+
+Policy statements that are allowed to contain wildcards.
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.id"></a>
+
+```typescript
+public readonly id: string;
+```
+
+- *Type:* string
+
+The cdk-nag rule ID (typically 'AwsSolutions-IAM5').
+
+---
+
+##### `reason`<sup>Required</sup> <a name="reason" id="@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps.property.reason"></a>
+
+```typescript
+public readonly reason: string;
+```
+
+- *Type:* string
+
+Explanation for why the suppression is acceptable.
+
+---
+
+### LogBucketS1SuppressionAndTagProps <a name="LogBucketS1SuppressionAndTagProps" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps"></a>
+
+#### Initializer <a name="Initializer" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.Initializer"></a>
+
+```typescript
+import { LogBucketS1SuppressionAndTagProps } from '@jaykingson/cdk-nag-custom-nag-pack'
+
+const logBucketS1SuppressionAndTagProps: LogBucketS1SuppressionAndTagProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.logBucketTagName">logBucketTagName</a></code> | <code>string</code> | Tag name indicating the bucket is a log bucket. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.logBucketTagValue">logBucketTagValue</a></code> | <code>string</code> | Tag value for log bucket indicator. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.reason">reason</a></code> | <code>string</code> | Optional custom reason for the suppression. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.taggedByTagName">taggedByTagName</a></code> | <code>string</code> | Tag name indicating who tagged the bucket. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.taggedByTagValue">taggedByTagValue</a></code> | <code>string</code> | Tag value for the tagged by indicator. |
+
+---
+
+##### `logBucketTagName`<sup>Optional</sup> <a name="logBucketTagName" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.logBucketTagName"></a>
+
+```typescript
+public readonly logBucketTagName: string;
+```
+
+- *Type:* string
+- *Default:* "isLogBucket"
+
+Tag name indicating the bucket is a log bucket.
+
+---
+
+##### `logBucketTagValue`<sup>Optional</sup> <a name="logBucketTagValue" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.logBucketTagValue"></a>
+
+```typescript
+public readonly logBucketTagValue: string;
+```
+
+- *Type:* string
+- *Default:* "true"
+
+Tag value for log bucket indicator.
+
+---
+
+##### `reason`<sup>Optional</sup> <a name="reason" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.reason"></a>
+
+```typescript
+public readonly reason: string;
+```
+
+- *Type:* string
+
+Optional custom reason for the suppression.
+
+---
+
+##### `taggedByTagName`<sup>Optional</sup> <a name="taggedByTagName" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.taggedByTagName"></a>
+
+```typescript
+public readonly taggedByTagName: string;
+```
+
+- *Type:* string
+- *Default:* "LogBucketTaggedBy"
+
+Tag name indicating who tagged the bucket.
+
+---
+
+##### `taggedByTagValue`<sup>Optional</sup> <a name="taggedByTagValue" id="@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps.property.taggedByTagValue"></a>
+
+```typescript
+public readonly taggedByTagValue: string;
+```
+
+- *Type:* string
+- *Default:* "cdkNagCustomChecks"
+
+Tag value for the tagged by indicator.
 
 ---
 
@@ -242,16 +407,29 @@ public readonly cr2TagsWithValueToCheck: {[ key: string ]: string[]};
 ---
 
 
-### NagSuppressions <a name="NagSuppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions"></a>
+### CustomChecksSuppressions <a name="CustomChecksSuppressions" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions"></a>
 
-Helper class with methods to add cdk-nag suppressions to cdk resources.
+Consolidated suppression utilities for cdk-nag custom checks.
 
-#### Initializers <a name="Initializers" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.Initializer"></a>
+This class provides suppression helper methods for custom checks,
+including log bucket suppressions and IAM5 granular suppressions.
+
+*Example*
 
 ```typescript
-import { NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack';
 
-new NagSuppressions()
+// Suppress S1 for a log bucket
+CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(logBucket);
+```
+
+
+#### Initializers <a name="Initializers" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.Initializer"></a>
+
+```typescript
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+
+new CustomChecksSuppressions()
 ```
 
 | **Name** | **Type** | **Description** |
@@ -264,119 +442,112 @@ new NagSuppressions()
 
 | **Name** | **Description** |
 | --- | --- |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressions">addResourceSuppressions</a></code> | Add cdk-nag suppressions to a CfnResource and optionally its children. |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath">addResourceSuppressionsByPath</a></code> | Add cdk-nag suppressions to a CfnResource and optionally its children via its path. |
-| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addStackSuppressions">addStackSuppressions</a></code> | Apply cdk-nag suppressions to a Stack and optionally nested stacks. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addIam5StatementResourceSuppressions">addIam5StatementResourceSuppressions</a></code> | Granularly suppress AwsSolutions-IAM5 findings for specific IAM policy statements. |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addLogBucketS1Suppression">addLogBucketS1Suppression</a></code> | *No description.* |
+| <code><a href="#@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket">addS1SuppressionAndTagAsLogBucket</a></code> | Suppress AwsSolutions-S1 finding for a log bucket and tag it as a log bucket. |
 
 ---
 
-##### `addResourceSuppressions` <a name="addResourceSuppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressions"></a>
+##### `addIam5StatementResourceSuppressions` <a name="addIam5StatementResourceSuppressions" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addIam5StatementResourceSuppressions"></a>
 
 ```typescript
-import { NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
 
-NagSuppressions.addResourceSuppressions(construct: IConstruct | IConstruct[], suppressions: NagPackSuppression[], applyToChildren?: boolean)
+CustomChecksSuppressions.addIam5StatementResourceSuppressions(resource: IConstruct, suppressions: Iam5StatementResourceSuppressionsProps, applyToChildren?: boolean)
 ```
 
-Add cdk-nag suppressions to a CfnResource and optionally its children.
+Granularly suppress AwsSolutions-IAM5 findings for specific IAM policy statements.
 
-###### `construct`<sup>Required</sup> <a name="construct" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressions.parameter.construct"></a>
+This method only suppresses the finding if ALL wildcard-containing statements in the
+resource's policy have a matching entry in the appliesTo array. This ensures you only
+suppress the specific wildcard permissions you've intentionally reviewed and approved.
 
-- *Type:* constructs.IConstruct | constructs.IConstruct[]
+###### `resource`<sup>Required</sup> <a name="resource" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addIam5StatementResourceSuppressions.parameter.resource"></a>
 
-The IConstruct(s) to apply the suppression to.
+- *Type:* constructs.IConstruct
 
----
-
-###### `suppressions`<sup>Required</sup> <a name="suppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressions.parameter.suppressions"></a>
-
-- *Type:* cdk-nag.NagPackSuppression[]
-
-A list of suppressions to apply to the resource.
+The CDK construct to suppress findings for (typically a Lambda, Role, etc.).
 
 ---
 
-###### `applyToChildren`<sup>Optional</sup> <a name="applyToChildren" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressions.parameter.applyToChildren"></a>
+###### `suppressions`<sup>Required</sup> <a name="suppressions" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addIam5StatementResourceSuppressions.parameter.suppressions"></a>
+
+- *Type:* <a href="#@jaykingson/cdk-nag-custom-nag-pack.Iam5StatementResourceSuppressionsProps">Iam5StatementResourceSuppressionsProps</a>
+
+Suppression configuration object.
+
+---
+
+###### `applyToChildren`<sup>Optional</sup> <a name="applyToChildren" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addIam5StatementResourceSuppressions.parameter.applyToChildren"></a>
 
 - *Type:* boolean
 
-Apply the suppressions to children CfnResources  (default:false).
+Whether to apply suppressions to child constructs (default: false).
 
 ---
 
-##### `addResourceSuppressionsByPath` <a name="addResourceSuppressionsByPath" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath"></a>
+##### ~~`addLogBucketS1Suppression`~~ <a name="addLogBucketS1Suppression" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addLogBucketS1Suppression"></a>
 
 ```typescript
-import { NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
 
-NagSuppressions.addResourceSuppressionsByPath(stack: Stack, path: string | string[], suppressions: NagPackSuppression[], applyToChildren?: boolean)
+CustomChecksSuppressions.addLogBucketS1Suppression(bucket: IConstruct, reason?: string)
 ```
 
-Add cdk-nag suppressions to a CfnResource and optionally its children via its path.
+###### `bucket`<sup>Required</sup> <a name="bucket" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addLogBucketS1Suppression.parameter.bucket"></a>
 
-###### `stack`<sup>Required</sup> <a name="stack" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath.parameter.stack"></a>
-
-- *Type:* aws-cdk-lib.Stack
-
-The Stack the construct belongs to.
+- *Type:* constructs.IConstruct
 
 ---
 
-###### `path`<sup>Required</sup> <a name="path" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath.parameter.path"></a>
+###### `reason`<sup>Optional</sup> <a name="reason" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addLogBucketS1Suppression.parameter.reason"></a>
 
-- *Type:* string | string[]
-
-The path(s) to the construct in the provided stack.
+- *Type:* string
 
 ---
 
-###### `suppressions`<sup>Required</sup> <a name="suppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath.parameter.suppressions"></a>
-
-- *Type:* cdk-nag.NagPackSuppression[]
-
-A list of suppressions to apply to the resource.
-
----
-
-###### `applyToChildren`<sup>Optional</sup> <a name="applyToChildren" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addResourceSuppressionsByPath.parameter.applyToChildren"></a>
-
-- *Type:* boolean
-
-Apply the suppressions to children CfnResources  (default:false).
-
----
-
-##### `addStackSuppressions` <a name="addStackSuppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addStackSuppressions"></a>
+##### `addS1SuppressionAndTagAsLogBucket` <a name="addS1SuppressionAndTagAsLogBucket" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket"></a>
 
 ```typescript
-import { NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
 
-NagSuppressions.addStackSuppressions(stack: Stack, suppressions: NagPackSuppression[], applyToNestedStacks?: boolean)
+CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(bucket: IConstruct, props?: LogBucketS1SuppressionAndTagProps)
 ```
 
-Apply cdk-nag suppressions to a Stack and optionally nested stacks.
+Suppress AwsSolutions-S1 finding for a log bucket and tag it as a log bucket.
 
-###### `stack`<sup>Required</sup> <a name="stack" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addStackSuppressions.parameter.stack"></a>
+Log buckets cannot have their own server access logging enabled as that would
+create an infinite recursion loop. This method suppresses the S1 finding
+with an appropriate explanation.
 
-- *Type:* aws-cdk-lib.Stack
+This suppression is automatically applied by `LogBucketTagger` when
+`enableLogBucketTagger` is set to true in CustomChecks.
 
-The Stack to apply the suppression to.
+*Example*
+
+```typescript
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack';
+
+const logBucket = new Bucket(stack, 'LogBucket');
+
+// Mark a bucket as log bucket (tags + suppresses AwsSolutions-S1)
+CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(logBucket);
+```
+
+
+###### `bucket`<sup>Required</sup> <a name="bucket" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket.parameter.bucket"></a>
+
+- *Type:* constructs.IConstruct
+
+The S3 bucket construct that is used as a log bucket.
 
 ---
 
-###### `suppressions`<sup>Required</sup> <a name="suppressions" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addStackSuppressions.parameter.suppressions"></a>
+###### `props`<sup>Optional</sup> <a name="props" id="@jaykingson/cdk-nag-custom-nag-pack.CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket.parameter.props"></a>
 
-- *Type:* cdk-nag.NagPackSuppression[]
+- *Type:* <a href="#@jaykingson/cdk-nag-custom-nag-pack.LogBucketS1SuppressionAndTagProps">LogBucketS1SuppressionAndTagProps</a>
 
-A list of suppressions to apply to the stack.
-
----
-
-###### `applyToNestedStacks`<sup>Optional</sup> <a name="applyToNestedStacks" id="@jaykingson/cdk-nag-custom-nag-pack.NagSuppressions.addStackSuppressions.parameter.applyToNestedStacks"></a>
-
-- *Type:* boolean
-
-Apply the suppressions to children stacks (default:false).
+Optional suppression reason and tag configuration.
 
 ---
 

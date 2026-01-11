@@ -2,6 +2,7 @@
 
 [![All Contributors](https://img.shields.io/github/all-contributors/JohannesKonings/cdk-nag-custom-nag-pack?color=ee8449&style=flat-square)](#contributors)
 
+
 ## rules
 
 | Rule ID | Cause                         | Explanation                                  |
@@ -28,25 +29,33 @@ Handled custom resource types:
 * `Custom::S3BucketNotifications`
 * `Custom::SopsSync`
 
-## granular AwsSolutions-IAM5 suppressions
+### custom checks suppressions
+
+This package exposes `CustomChecksSuppressions` as a central place for cdk-nag suppression helpers.
+
+#### cdk-nag suppression for log buckets (AwsSolutions-S1)
+
+There are two ways a bucket can be treated as a **log bucket**:
+
+1) **Derived in-app**: when `enableLogBucketTagger: true` is enabled, this package identifies buckets that are used as `serverAccessLogsBucket` destinations and automatically tags + suppresses `AwsSolutions-S1`.
+2) **Manually marked**: if a bucket in this CDK app will be used *externally* as a log bucket (and this cannot be derived from `serverAccessLogsBucket` usage in the same app), you can mark it explicitly.
+
+> Important: `LogBucketTagger` is the single source of truth for the log-bucket tag names/values.
+> `CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(...)` delegates tagging to `LogBucketTagger` so the defaults (and any custom tag configuration) stay consistent.
+
+Reason used:
+"This is intended to be a log bucket. Log bucket does not require access logging to prevent infinite loop"
+
+#### granular AwsSolutions-IAM5 suppressions
 
 The `AwsSolutions-IAM5` rule flags IAM policies that use wildcard permissions (`*`) in actions or resources. While wildcards should generally be avoided, some AWS services require them for proper functionality (e.g., X-Ray tracing).
 
-This package provides `Iam5NagSuppressions.addIam5StatementResourceSuppressions()` for **granular suppression** of specific IAM policy statements. Instead of suppressing all IAM5 findings for a resource, you can suppress only the exact policy statements that genuinely require wildcards.
+This package provides `CustomChecksSuppressions.addIam5StatementResourceSuppressions()` for **granular suppression** of specific IAM policy statements. Instead of suppressing all IAM5 findings for a resource, you can suppress only the exact policy statements that genuinely require wildcards.
 
-### How it works
-
-The method compares the actual IAM policy statements attached to a resource against the policy statements you specify in `appliesTo`. It will **only** suppress the `AwsSolutions-IAM5` finding if:
-
-1. All wildcard-containing statements in the resource's policy have a matching entry in `appliesTo`
-2. The statements match exactly (same Effect, Actions, and Resources)
-
-If any wildcard statement doesn't match an `appliesTo` entry, the suppression is **not applied** and cdk-nag will still flag the finding.
-
-### Example usage
+##### Example usage
 
 ```typescript
-import { Iam5NagSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
 
 const policyStatementForSuppression: PolicyStatementProps = {
   actions: ['xray:PutTelemetryRecords', 'xray:PutTraceSegments'],
@@ -54,7 +63,7 @@ const policyStatementForSuppression: PolicyStatementProps = {
   effect: Effect.ALLOW,
 };
 
-Iam5NagSuppressions.addIam5StatementResourceSuppressions(
+CustomChecksSuppressions.addIam5StatementResourceSuppressions(
   lambda,
   {
     id: 'AwsSolutions-IAM5',
@@ -65,7 +74,49 @@ Iam5NagSuppressions.addIam5StatementResourceSuppressions(
 );
 ```
 
-This approach ensures you only suppress the specific wildcard permissions you've intentionally reviewed and approved, while catching any unintended wildcards that might be added later.
+##### helpers
+
+```typescript
+import { CustomChecksSuppressions } from '@jaykingson/cdk-nag-custom-nag-pack'
+
+// Marks the bucket as a log bucket (tags + suppresses AwsSolutions-S1)
+CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(myLogBucket);
+```
+
+## log bucket tagger
+
+Third-party security scanners often flag S3 buckets that don't have server access logging enabled. However, log buckets themselves cannot have their own log bucket (that would create infinite recursion). The `enableLogBucketTagger` option automatically tags S3 buckets used as logging destinations, making it easier for security scanners to identify and exclude them from "missing logging" checks.
+
+### Tags applied
+
+| Tag Name | Tag Value | Description |
+| -------- | --------- | ----------- |
+| `isLogBucket` | `true` | Identifies the bucket as a log destination |
+| `LogBucketTaggedBy` | `cdkNagCustomChecks` | Identifies that this package applied the tag |
+
+> Note: The defaults above are owned by `LogBucketTagger`.
+> If you configure custom tag names/values on `LogBucketTagger`, those will be used consistently for both auto-tagging and manual marking.
+
+### How it works
+
+The tagger identifies log buckets by inspecting the `LoggingConfiguration.DestinationBucketName` property of S3 buckets. It supports:
+
+- **Same-stack references** via `Ref` or `Fn::GetAtt`
+- **Cross-stack references** via `Fn::ImportValue` (when applied at App level)
+
+> **Note:** Buckets referenced by string literals (external bucket names) cannot be tagged as they exist outside the CDK app.
+
+### Usage
+
+```typescript
+Aspects.of(app).add(new CustomChecks({
+  enableLogBucketTagger: true,
+}));
+```
+
+> Note: When `enableLogBucketTagger: true` is enabled, the log bucket `AwsSolutions-S1` suppression is applied automatically to identified log buckets.
+
+If you create a bucket that will be used as a log bucket by systems outside of this CDK app, you can manually mark it using `CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(...)`.
 
 ## config
 
@@ -80,6 +131,8 @@ Aspects.of(app).add(new CustomChecks({
   cr2TagsWithValueToCheck: { Stage: ["dev", "prod"] },
   // activate the suppression of the custom resource singleton lambda
   suppressSingletonLambdaFindings: true,
+  // automatically tag S3 log buckets for security scanners
+  enableLogBucketTagger: true,
 }));
 ```
 

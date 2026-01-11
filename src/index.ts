@@ -1,2 +1,6 @@
 export { CustomChecks, CustomChecksProps } from "./customChecks";
-export { NagSuppressions } from "cdk-nag";
+export {
+  CustomChecksSuppressions,
+  LogBucketS1SuppressionAndTagProps,
+  Iam5StatementResourceSuppressionsProps,
+} from "./customChecksSuppressions";

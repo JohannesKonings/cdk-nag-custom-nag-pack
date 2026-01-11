@@ -216,12 +216,33 @@ export class LogBucketTagger implements IAspect {
   private tagLogBucketsAcrossStacks(root: App | Stage): void {
     // Collect all buckets across all stacks
     const allBuckets = new Map<string, BucketInfo>();
-    // Map export names to bucket logical IDs (for cross-stack Fn::ImportValue)
+    // Map export names to bucket keys (for cross-stack Fn::ImportValue)
     const exportToBucket = new Map<string, string>();
-    // Destinations that need to be tagged (logical IDs or export names)
+    // Destinations that need to be tagged (bucket keys or, in legacy cases, bare logical IDs)
     const logBucketDestinations = new Set<string>();
     // Import value destinations (to resolve later)
     const importValueDestinations = new Set<string>();
+
+    const resolveBucketInfo = (destination: string): BucketInfo | undefined => {
+      // Preferred: composite key lookup
+      const byKey = allBuckets.get(destination);
+      if (byKey) {
+        return byKey;
+      }
+
+      // Fallback: destination may be a bare logical ID; scan for an unambiguous match.
+      // If multiple stacks contain the same logical ID, do not pick one (avoids collisions).
+      let match: BucketInfo | undefined;
+      for (const bucketInfo of allBuckets.values()) {
+        if (bucketInfo.logicalId === destination) {
+          if (match) {
+            return undefined;
+          }
+          match = bucketInfo;
+        }
+      }
+      return match;
+    };
 
     // Find all stacks
     const stacks: Stack[] = [];
@@ -238,9 +259,6 @@ export class LogBucketTagger implements IAspect {
           const logicalId = stack.getLogicalId(child);
           const key = `${stack.stackName}:${logicalId}`;
           allBuckets.set(key, { bucket: child, stack, logicalId });
-
-          // Also store by just logical ID for same-stack references
-          allBuckets.set(logicalId, { bucket: child, stack, logicalId });
         }
 
         // Track CfnOutputs that export bucket references
@@ -251,7 +269,7 @@ export class LogBucketTagger implements IAspect {
             // Check if the output value references a bucket
             const logicalId = this.extractLogicalIdFromValue(value);
             if (logicalId) {
-              exportToBucket.set(exportName, logicalId);
+              exportToBucket.set(exportName, `${stack.stackName}:${logicalId}`);
             }
           }
         }
@@ -274,9 +292,12 @@ export class LogBucketTagger implements IAspect {
                 importValueDestinations.add(exportName);
               } else {
                 // Same-stack Ref or Fn::GetAtt
-                const logicalId = this.extractLogicalId(destinationBucketName);
-                if (logicalId) {
-                  logBucketDestinations.add(logicalId);
+                const destination = this.extractLogicalId(
+                  destinationBucketName,
+                  stack,
+                );
+                if (destination) {
+                  logBucketDestinations.add(destination);
                 }
               }
             }
@@ -287,15 +308,15 @@ export class LogBucketTagger implements IAspect {
 
     // Resolve Fn::ImportValue destinations to bucket logical IDs
     for (const exportName of importValueDestinations) {
-      const logicalId = exportToBucket.get(exportName);
-      if (logicalId) {
-        logBucketDestinations.add(logicalId);
+      const bucketKey = exportToBucket.get(exportName);
+      if (bucketKey) {
+        logBucketDestinations.add(bucketKey);
       }
     }
 
     // Third pass: apply tags to log buckets
-    for (const logicalId of logBucketDestinations) {
-      const bucketInfo = allBuckets.get(logicalId);
+    for (const destination of logBucketDestinations) {
+      const bucketInfo = resolveBucketInfo(destination);
       if (bucketInfo) {
         CustomChecksSuppressions.addS1SuppressionAndTagAsLogBucket(
           bucketInfo.bucket,
@@ -353,16 +374,27 @@ export class LogBucketTagger implements IAspect {
   }
 
   /**
-   * Extract logical ID from a CloudFormation reference
+   * Extract logical ID from a CloudFormation reference.
+   *
+   * When a stack is provided, returns a composite key scoped to that stack.
    */
-  private extractLogicalId(destinationBucketName: unknown): string | undefined {
+  private extractLogicalId(
+    destinationBucketName: unknown,
+    stack?: Stack,
+  ): string | undefined {
+    let logicalId: string | undefined;
     if (isCfnRef(destinationBucketName)) {
-      return destinationBucketName.Ref;
+      logicalId = destinationBucketName.Ref;
     }
     if (isCfnFnGetAtt(destinationBucketName)) {
-      return destinationBucketName["Fn::GetAtt"][0];
+      logicalId = destinationBucketName["Fn::GetAtt"][0];
     }
-    return undefined;
+
+    if (!logicalId) {
+      return undefined;
+    }
+
+    return stack ? `${stack.stackName}:${logicalId}` : logicalId;
   }
 
   /**

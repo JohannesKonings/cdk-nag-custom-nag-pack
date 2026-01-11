@@ -8,6 +8,7 @@ import {
   AwsSolutionsChecks,
 } from "cdk-nag";
 import { IConstruct } from "constructs";
+import { LogBucketTagger } from "./logBucketTagger";
 import { TagsExist, TagsWithValueExist } from "./rules";
 
 export type Cr1TagsToCheck = string[];
@@ -35,6 +36,19 @@ export interface CustomChecksProps extends NagPackProps {
    * @default false - custom resource singleton lambda findings will not be suppressed
    */
   readonly suppressSingletonLambdaFindings?: boolean;
+  /**
+   * Enable automatic tagging of S3 log buckets for third-party security scanners.
+   * Security scanners often flag buckets without server access logging enabled, but log buckets
+   * themselves cannot have their own log bucket (that would create infinite recursion).
+   * When enabled, buckets used as logging destinations will be tagged with:
+   * - `isLogBucket: "true"` - identifies the bucket as a log bucket
+   * - `LogBucketTaggedBy: "cdkNagCustomChecks"` - identifies who applied the tag
+   *
+   * This allows security scanners to identify and exclude log buckets from "missing logging" checks.
+   * Supports cross-stack references when applied at App level.
+   * @default false - log buckets will not be automatically tagged
+   */
+  readonly enableLogBucketTagger?: boolean;
 }
 
 export class CustomChecks extends NagPack {
@@ -42,6 +56,9 @@ export class CustomChecks extends NagPack {
   static cr2TagsWithValueToCheck: Cr2TagsWithValueToCheck;
   private enableAwsSolutionChecks?: boolean;
   private suppressSingletonLambdaFindings: boolean;
+  private enableLogBucketTagger: boolean;
+  private logBucketTagger?: LogBucketTagger;
+
   constructor(props?: CustomChecksProps) {
     super(props);
     this.packName = "CustomChecks";
@@ -50,11 +67,22 @@ export class CustomChecks extends NagPack {
     this.enableAwsSolutionChecks = props?.enableAwsSolutionChecks;
     this.suppressSingletonLambdaFindings =
       props?.suppressSingletonLambdaFindings || false;
+    this.enableLogBucketTagger = props?.enableLogBucketTagger || false;
+    if (this.enableLogBucketTagger) {
+      this.logBucketTagger = new LogBucketTagger();
+    }
   }
   public visit(node: IConstruct): void {
     if (this.enableAwsSolutionChecks) {
       new AwsSolutionsChecks().visit(node);
     }
+
+    // Tag log buckets for third party security scanners
+    // Handles both App/Stage level (cross-stack) and Stack level (single-stack)
+    if (this.enableLogBucketTagger && this.logBucketTagger) {
+      this.logBucketTagger.visit(node);
+    }
+
     if (node instanceof CfnResource) {
       if (CustomChecks.cr1TagsToCheck.length > 0) {
         this.checkTagsExist(node);
@@ -62,11 +90,10 @@ export class CustomChecks extends NagPack {
       if (Object.keys(CustomChecks.cr2TagsWithValueToCheck).length > 0) {
         this.checkTagsWithValueExist(node);
       }
-    } else if (
-      this.suppressSingletonLambdaFindings === true &&
-      node instanceof Stack
-    ) {
-      this.suppressCustomResource(node);
+    } else if (node instanceof Stack) {
+      if (this.suppressSingletonLambdaFindings === true) {
+        this.suppressCustomResource(node);
+      }
     }
   }
 
